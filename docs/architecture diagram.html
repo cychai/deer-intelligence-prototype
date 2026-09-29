@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>蒙阴·玉皇山梅花鹿智慧养殖系统架构图 V2</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js" integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js" integrity="sha384-en/ztfPSRkGfME4KIm05joYXynqzUgbsG5nMrj/xEFAHXkeZfO3yMK8QQ+mP7p1/" crossorigin="anonymous"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "JetBrains Mono", "Noto Sans SC", monospace;
+      background: #020617;
+      min-height: 100vh;
+      padding: 2rem;
+      color: #f8fafc;
+    }
+    .container { max-width: 1480px; margin: 0 auto; }
+    .header { margin-bottom: 1.5rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.45rem; }
+    .pulse-dot {
+      width: 12px; height: 12px; border-radius: 50%;
+      background: #22d3ee; box-shadow: 0 0 18px rgba(34, 211, 238, 0.6);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+    h1 { font-size: 1.45rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.82rem; margin-left: 1.75rem; }
+    .diagram-container {
+      background: rgba(15, 23, 42, 0.55);
+      border-radius: 1rem;
+      border: 1px solid #1e293b;
+      padding: 1.25rem;
+      overflow-x: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+    }
+    svg { width: 100%; min-width: 1180px; display: block; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.55);
+      border-radius: 0.75rem;
+      border: 1px solid #1e293b;
+      padding: 1.1rem 1.2rem;
+    }
+    .card-header { display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.7rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    .card h3 { font-size: 0.86rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.72rem; line-height: 1.55; }
+    .card li { margin-bottom: 0.25rem; }
+    .footer { text-align: center; margin-top: 1.25rem; color: #475569; font-size: 0.7rem; }
+    .toolbar { display: flex; gap: 0.5rem; margin-left: auto; flex-shrink: 0; align-items: center; }
+    .toolbar-toggle {
+      background: transparent; border: none; color: #475569; cursor: pointer;
+      font-size: 1.25rem; line-height: 1; padding: 0.25rem 0.5rem;
+      border-radius: 0.375rem; transition: color 0.2s, background 0.2s;
+    }
+    .toolbar-toggle:hover { color: #94a3b8; background: rgba(30, 41, 59, 0.5); }
+    .toolbar-actions { display: none; gap: 0.5rem; }
+    .toolbar.expanded .toolbar-actions { display: flex; }
+    .toolbar-actions button {
+      background: rgba(30, 41, 59, 0.8); border: 1px solid #334155; color: #94a3b8;
+      padding: 0.375rem 0.75rem; border-radius: 0.375rem; font-family: inherit;
+      font-size: 0.72rem; cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .toolbar-actions button:hover { background: rgba(51, 65, 85, 0.8); color: white; border-color: #475569; }
+    @media (max-width: 760px) {
+      body { padding: 1rem; }
+      h1 { font-size: 1.05rem; }
+      .subtitle { margin-left: 0; line-height: 1.5; }
+    }
+    @media print {
+      body { background: #020617; padding: 1rem; }
+      .toolbar { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="report-container">
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>蒙阴·玉皇山梅花鹿智慧养殖系统架构 V2</h1>
+        <div class="toolbar">
+          <div class="toolbar-actions">
+            <button onclick="copyAsImage(this)">📋 Copy</button>
+            <button onclick="downloadPNG(this)">🖼️ PNG</button>
+            <button onclick="downloadPDF(this)">📄 PDF</button>
+          </div>
+          <button class="toolbar-toggle" onclick="this.parentElement.classList.toggle('expanded')" title="导出选项" aria-label="导出选项">⋯</button>
+        </div>
+      </div>
+      <p class="subtitle">一期技术基线｜模块化单体 · 统一事实源 · 边缘离线自治 · 本地安全控制 · AI人工闭环</p>
+    </div>
+
+    <div class="diagram-container">
+      <svg viewBox="0 0 1480 1120" role="img" aria-labelledby="diagram-title diagram-desc">
+        <title id="diagram-title">梅花鹿智慧养殖系统架构图</title>
+        <desc id="diagram-desc">展示用户渠道、中心业务区、统一事实底座、规则与AI、异步集成、现场接入、现场感知以及独立安全控制闭环。</desc>
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+          </marker>
+          <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee"/>
+          </marker>
+          <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#34d399"/>
+          </marker>
+          <marker id="arrow-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fb923c"/>
+          </marker>
+          <marker id="arrow-rose" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fb7185"/>
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+          <filter id="soft-glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <rect width="100%" height="100%" fill="url(#grid)"/>
+
+        <!-- Connections are rendered before boxes so they stay behind components. -->
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <!-- User channels to center access -->
+          <path d="M 260 121 L 260 150 L 675 150 L 675 190" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+          <path d="M 550 121 L 550 150 L 675 150 L 675 190" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+          <path d="M 835 121 L 835 150 L 805 150 L 805 190" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+          <path d="M 1120 121 L 1120 150 L 805 150 L 805 190" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+
+          <!-- Access layer into business service -->
+          <path d="M 675 250 L 675 285" stroke="#34d399" stroke-width="1.7" marker-end="url(#arrow-green)"/>
+          <path d="M 805 250 L 805 285" stroke="#34d399" stroke-width="1.7" marker-end="url(#arrow-green)"/>
+
+          <!-- Domain modules to transaction core and fact store -->
+          <path d="M 740 455 L 740 482" stroke="#34d399" stroke-width="1.8" marker-end="url(#arrow-green)"/>
+          <path d="M 740 542 L 740 584" stroke="#a78bfa" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+          <!-- Fact store to projections / AI / event bus -->
+          <path d="M 535 680 L 455 680 L 455 755" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <path d="M 740 680 L 740 755" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <path d="M 945 680 L 1025 680 L 1025 755" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+
+          <!-- AI advice back to work orders -->
+          <path d="M 740 815 L 740 840 L 935 840 L 935 435" stroke="#fbbf24" stroke-width="1.3" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+
+          <!-- Outbox to external adapters -->
+          <path d="M 1110 790 L 1205 790" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+          <path d="M 1325 735 L 1325 688" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arrow)"/>
+          <path d="M 1325 845 L 1325 890" stroke="#94a3b8" stroke-width="1.3" marker-end="url(#arrow)"/>
+
+          <!-- Field observations to edge and center -->
+          <path d="M 295 1015 L 295 965" stroke="#22d3ee" stroke-width="1.7" marker-end="url(#arrow-cyan)"/>
+          <path d="M 495 1015 L 495 965" stroke="#22d3ee" stroke-width="1.7" marker-end="url(#arrow-cyan)"/>
+          <path d="M 695 1015 L 695 965" stroke="#22d3ee" stroke-width="1.7" marker-end="url(#arrow-cyan)"/>
+          <path d="M 895 1015 L 895 965" stroke="#22d3ee" stroke-width="1.7" marker-end="url(#arrow-cyan)"/>
+          <path d="M 590 895 L 590 865 L 535 865 L 535 815" stroke="#22d3ee" stroke-width="1.6" marker-end="url(#arrow-cyan)"/>
+
+          <!-- Center approved configuration to local controller -->
+          <path d="M 930 455 L 930 525 L 1165 525 L 1165 895" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="6,5" marker-end="url(#arrow-rose)"/>
+          <!-- Local closed-loop control -->
+          <path d="M 1165 965 L 1165 1008" stroke="#fb7185" stroke-width="2" marker-end="url(#arrow-rose)"/>
+          <path d="M 1280 1045 L 1350 1045 L 1350 930 L 1235 930" stroke="#fb7185" stroke-width="1.6" marker-end="url(#arrow-rose)"/>
+          <path d="M 1085 1045 L 1015 1045 L 1015 930 L 1095 930" stroke="#fb7185" stroke-width="1.6" marker-end="url(#arrow-rose)"/>
+        </g>
+
+        <!-- Top users and channels -->
+        <text x="35" y="35" fill="#64748b" font-size="9" letter-spacing="1.5">01 / USERS &amp; CHANNELS</text>
+        <rect x="35" y="50" width="1410" height="95" rx="12" fill="rgba(8, 51, 68, 0.12)" stroke="#164e63" stroke-width="1"/>
+
+        <rect x="150" y="72" width="220" height="49" rx="7" fill="#0f172a"/>
+        <rect x="150" y="72" width="220" height="49" rx="7" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.4"/>
+        <text x="260" y="94" fill="#f8fafc" font-size="11" font-weight="600" text-anchor="middle">基地运营与专业人员</text>
+        <text x="260" y="110" fill="#94a3b8" font-size="8" text-anchor="middle">管理 Web / 现场移动端</text>
+
+        <rect x="440" y="72" width="220" height="49" rx="7" fill="#0f172a"/>
+        <rect x="440" y="72" width="220" height="49" rx="7" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.4"/>
+        <text x="550" y="94" fill="#f8fafc" font-size="11" font-weight="600" text-anchor="middle">合作农户 / 技术员</text>
+        <text x="550" y="110" fill="#94a3b8" font-size="8" text-anchor="middle">扫码 · 离线录入 · 工单 · 结算</text>
+
+        <rect x="725" y="72" width="220" height="49" rx="7" fill="#0f172a"/>
+        <rect x="725" y="72" width="220" height="49" rx="7" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1.4"/>
+        <text x="835" y="94" fill="#f8fafc" font-size="11" font-weight="600" text-anchor="middle">B端客户 / 公众</text>
+        <text x="835" y="110" fill="#94a3b8" font-size="8" text-anchor="middle">授权交付 / 脱敏追溯 H5</text>
+
+        <rect x="1010" y="72" width="220" height="49" rx="7" fill="#0f172a"/>
+        <rect x="1010" y="72" width="220" height="49" rx="7" fill="rgba(30, 41, 59, 0.65)" stroke="#94a3b8" stroke-width="1.4"/>
+        <text x="1120" y="94" fill="#f8fafc" font-size="11" font-weight="600" text-anchor="middle">监管 / 外部业务系统</text>
+        <text x="1120" y="110" fill="#94a3b8" font-size="8" text-anchor="middle">受控导出 · API · 业务回执</text>
+
+        <!-- Center business zone -->
+        <rect x="170" y="170" width="1040" height="685" rx="15" fill="rgba(251, 191, 36, 0.025)" stroke="#fbbf24" stroke-width="1.1" stroke-dasharray="8,5"/>
+        <text x="190" y="190" fill="#fbbf24" font-size="10" font-weight="600">中心业务区｜专属云优先，可按监管与网络条件本地化部署</text>
+
+        <!-- Access and security -->
+        <rect x="515" y="205" width="450" height="60" rx="9" fill="#0f172a"/>
+        <rect x="515" y="205" width="450" height="60" rx="9" fill="rgba(136, 19, 55, 0.2)" stroke="#fb7185" stroke-width="1.4"/>
+        <text x="740" y="228" fill="#f8fafc" font-size="11" font-weight="600" text-anchor="middle">统一访问与安全边界</text>
+        <text x="740" y="246" fill="#94a3b8" font-size="8" text-anchor="middle">HTTPS API · 强认证/MFA · 租户/组织/对象/字段授权 · 限流 · 审计</text>
+
+        <!-- Modular monolith -->
+        <rect x="250" y="285" width="980" height="170" rx="11" fill="#0f172a"/>
+        <rect x="250" y="285" width="980" height="170" rx="11" fill="rgba(6, 78, 59, 0.18)" stroke="#34d399" stroke-width="1.5"/>
+        <text x="270" y="307" fill="#34d399" font-size="10" font-weight="600">领域服务层｜模块化单体 + 明确模块 API</text>
+
+        <g>
+          <rect x="275" y="325" width="170" height="47" rx="6" fill="rgba(6, 78, 59, 0.42)" stroke="#34d399"/>
+          <text x="360" y="346" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">主数据与身份</text>
+          <text x="360" y="361" fill="#94a3b8" font-size="7.5" text-anchor="middle">鹿只 · 组织 · 设备 · 时态关系</text>
+
+          <rect x="465" y="325" width="170" height="47" rx="6" fill="rgba(6, 78, 59, 0.42)" stroke="#34d399"/>
+          <text x="550" y="346" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">生产与良种繁育</text>
+          <text x="550" y="361" fill="#94a3b8" font-size="7.5" text-anchor="middle">系谱 · 性能 · 配种 · 采茸</text>
+
+          <rect x="655" y="325" width="170" height="47" rx="6" fill="rgba(6, 78, 59, 0.42)" stroke="#34d399"/>
+          <text x="740" y="346" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">健康防疫与投入品</text>
+          <text x="740" y="361" fill="#94a3b8" font-size="7.5" text-anchor="middle">巡检 · 诊疗 · 用药 · 限制</text>
+
+          <rect x="845" y="325" width="170" height="47" rx="6" fill="rgba(6, 78, 59, 0.42)" stroke="#34d399"/>
+          <text x="930" y="346" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">环境设备与工单</text>
+          <text x="930" y="361" fill="#94a3b8" font-size="7.5" text-anchor="middle">告警 · 调度 · 控制审计</text>
+
+          <rect x="1035" y="325" width="170" height="47" rx="6" fill="rgba(6, 78, 59, 0.42)" stroke="#34d399"/>
+          <text x="1120" y="346" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">资产经营与农户</text>
+          <text x="1120" y="361" fill="#94a3b8" font-size="7.5" text-anchor="middle">订单 · 回款 · 成本 · 结算</text>
+
+          <rect x="370" y="390" width="210" height="47" rx="6" fill="rgba(6, 78, 59, 0.42)" stroke="#34d399"/>
+          <text x="475" y="411" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">批次 · 质量 · 库存</text>
+          <text x="475" y="426" fill="#94a3b8" font-size="7.5" text-anchor="middle">放行 · 冻结 · 出库 · 召回</text>
+
+          <rect x="635" y="390" width="210" height="47" rx="6" fill="rgba(6, 78, 59, 0.42)" stroke="#34d399"/>
+          <text x="740" y="411" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">标签编码与可信查询</text>
+          <text x="740" y="426" fill="#94a3b8" font-size="7.5" text-anchor="middle">销售单元 · 标签生命周期</text>
+
+          <rect x="900" y="390" width="210" height="47" rx="6" fill="rgba(136, 19, 55, 0.28)" stroke="#fb7185"/>
+          <text x="1005" y="411" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">权限 · 审计 · 规则门禁</text>
+          <text x="1005" y="426" fill="#94a3b8" font-size="7.5" text-anchor="middle">关键动作双人复核 / 状态阻断</text>
+        </g>
+
+        <!-- Transaction boundary -->
+        <rect x="365" y="482" width="750" height="60" rx="8" fill="#0f172a"/>
+        <rect x="365" y="482" width="750" height="60" rx="8" fill="rgba(6, 78, 59, 0.28)" stroke="#34d399" stroke-width="1.3"/>
+        <text x="740" y="505" fill="#f8fafc" font-size="10.5" font-weight="600" text-anchor="middle">事务与业务一致性边界</text>
+        <text x="740" y="524" fill="#94a3b8" font-size="8" text-anchor="middle">库存 / 质量 / 身份 / 已确认事件原子提交 · 行级锁 / 版本校验 · 业务记录与 Outbox 同事务</text>
+
+        <!-- Unified source of truth -->
+        <rect x="260" y="584" width="960" height="96" rx="10" fill="#0f172a"/>
+        <rect x="260" y="584" width="960" height="96" rx="10" fill="rgba(76, 29, 149, 0.22)" stroke="#a78bfa" stroke-width="1.6"/>
+        <text x="280" y="606" fill="#a78bfa" font-size="10" font-weight="600">统一事实底座｜一个事实源，多种业务视图</text>
+
+        <rect x="285" y="620" width="210" height="42" rx="6" fill="rgba(76, 29, 149, 0.42)" stroke="#a78bfa"/>
+        <text x="390" y="639" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">关系库 / 时序分区</text>
+        <text x="390" y="653" fill="#94a3b8" font-size="7.5" text-anchor="middle">PostgreSQL 类 · 事务约束</text>
+
+        <rect x="515" y="620" width="210" height="42" rx="6" fill="rgba(76, 29, 149, 0.42)" stroke="#a78bfa"/>
+        <text x="620" y="639" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">业务事件 / 更正日志</text>
+        <text x="620" y="653" fill="#94a3b8" font-size="7.5" text-anchor="middle">事件版本 · 证据链 · 幂等键</text>
+
+        <rect x="745" y="620" width="210" height="42" rx="6" fill="rgba(76, 29, 149, 0.42)" stroke="#a78bfa"/>
+        <text x="850" y="639" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">附件对象存储</text>
+        <text x="850" y="653" fill="#94a3b8" font-size="7.5" text-anchor="middle">报告 · 照片 · 视频 · 哈希</text>
+
+        <rect x="975" y="620" width="220" height="42" rx="6" fill="rgba(76, 29, 149, 0.42)" stroke="#a78bfa"/>
+        <text x="1085" y="639" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">备份 / 日志归档</text>
+        <text x="1085" y="653" fill="#94a3b8" font-size="7.5" text-anchor="middle">RPO ≤ 1h · RTO ≤ 4h（建议值）</text>
+
+        <!-- Derived capabilities -->
+        <rect x="260" y="755" width="300" height="60" rx="8" fill="#0f172a"/>
+        <rect x="260" y="755" width="300" height="60" rx="8" fill="rgba(8, 51, 68, 0.35)" stroke="#22d3ee" stroke-width="1.3"/>
+        <text x="410" y="778" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">可重建查询与分析投影</text>
+        <text x="410" y="797" fill="#94a3b8" font-size="8" text-anchor="middle">看板 · 图查询 · 经营视图 · 公众只读视图</text>
+
+        <rect x="590" y="755" width="300" height="60" rx="8" fill="#0f172a"/>
+        <rect x="590" y="755" width="300" height="60" rx="8" fill="rgba(120, 53, 15, 0.3)" stroke="#fbbf24" stroke-width="1.3"/>
+        <text x="740" y="778" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">规则与 AI 辅助服务</text>
+        <text x="740" y="797" fill="#94a3b8" font-size="8" text-anchor="middle">读事实、写建议 → 人工审批 / 工单；可停用</text>
+
+        <rect x="920" y="755" width="190" height="60" rx="8" fill="#0f172a"/>
+        <rect x="920" y="755" width="190" height="60" rx="8" fill="rgba(251, 146, 60, 0.26)" stroke="#fb923c" stroke-width="1.3"/>
+        <text x="1015" y="778" fill="#f8fafc" font-size="10" font-weight="600" text-anchor="middle">Outbox / 异步任务</text>
+        <text x="1015" y="797" fill="#94a3b8" font-size="8" text-anchor="middle">至少一次 + 业务幂等</text>
+
+        <!-- External integrations -->
+        <rect x="1240" y="590" width="205" height="330" rx="12" fill="rgba(30, 41, 59, 0.18)" stroke="#64748b" stroke-width="1" stroke-dasharray="6,4"/>
+        <text x="1260" y="612" fill="#94a3b8" font-size="9.5" font-weight="600">外部集成区</text>
+
+        <rect x="1260" y="630" width="165" height="58" rx="7" fill="#0f172a"/>
+        <rect x="1260" y="630" width="165" height="58" rx="7" fill="rgba(30, 41, 59, 0.62)" stroke="#94a3b8"/>
+        <text x="1342" y="652" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">监管 / 客户接口</text>
+        <text x="1342" y="670" fill="#94a3b8" font-size="7.5" text-anchor="middle">导出 · 报送 · 回执 · 纠正</text>
+
+        <rect x="1260" y="735" width="165" height="110" rx="7" fill="#0f172a"/>
+        <rect x="1260" y="735" width="165" height="110" rx="7" fill="rgba(251, 146, 60, 0.22)" stroke="#fb923c"/>
+        <text x="1342" y="758" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">集成适配器</text>
+        <text x="1342" y="778" fill="#94a3b8" font-size="7.5" text-anchor="middle">实验室 / 物流 / 会计映射</text>
+        <text x="1342" y="794" fill="#94a3b8" font-size="7.5" text-anchor="middle">第三方存证（可选）</text>
+        <text x="1342" y="814" fill="#fb923c" font-size="7.5" text-anchor="middle">失败不阻断核心交易</text>
+        <text x="1342" y="830" fill="#64748b" font-size="7" text-anchor="middle">接口上线须经授权与联调</text>
+
+        <rect x="1260" y="865" width="165" height="42" rx="7" fill="#0f172a"/>
+        <rect x="1260" y="865" width="165" height="42" rx="7" fill="rgba(30, 41, 59, 0.62)" stroke="#94a3b8"/>
+        <text x="1342" y="885" fill="#f8fafc" font-size="9" font-weight="600" text-anchor="middle">通知服务</text>
+        <text x="1342" y="899" fill="#94a3b8" font-size="7" text-anchor="middle">消息非业务成功依据</text>
+
+        <!-- Field edge zone -->
+        <rect x="60" y="875" width="940" height="225" rx="14" fill="rgba(8, 51, 68, 0.06)" stroke="#22d3ee" stroke-width="1" stroke-dasharray="8,5"/>
+        <text x="80" y="895" fill="#22d3ee" font-size="10" font-weight="600">现场接入区｜示范场与合作户共享语义，按场景差异化配置</text>
+
+        <rect x="125" y="910" width="870" height="55" rx="8" fill="#0f172a"/>
+        <rect x="125" y="910" width="870" height="55" rx="8" fill="rgba(8, 51, 68, 0.34)" stroke="#22d3ee" stroke-width="1.4"/>
+        <text x="560" y="932" fill="#f8fafc" font-size="10.5" font-weight="600" text-anchor="middle">边缘网关与现场工作站</text>
+        <text x="560" y="950" fill="#94a3b8" font-size="8" text-anchor="middle">协议适配 · 身份解析 · 质量校验 · 持久化队列（建议 ≥72h）· 幂等补传 · 必要录像 / 推理</text>
+
+        <rect x="210" y="1015" width="170" height="55" rx="7" fill="#0f172a"/>
+        <rect x="210" y="1015" width="170" height="55" rx="7" fill="rgba(30, 41, 59, 0.65)" stroke="#94a3b8"/>
+        <text x="295" y="1037" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">环境与个体感知</text>
+        <text x="295" y="1055" fill="#94a3b8" font-size="7.5" text-anchor="middle">Modbus · BLE · LoRaWAN · 4G</text>
+
+        <rect x="410" y="1015" width="170" height="55" rx="7" fill="#0f172a"/>
+        <rect x="410" y="1015" width="170" height="55" rx="7" fill="rgba(30, 41, 59, 0.65)" stroke="#94a3b8"/>
+        <text x="495" y="1037" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">视频与基础安防</text>
+        <text x="495" y="1055" fill="#94a3b8" font-size="7.5" text-anchor="middle">网络相机 · 本地录像 · 事件片段</text>
+
+        <rect x="610" y="1015" width="170" height="55" rx="7" fill="#0f172a"/>
+        <rect x="610" y="1015" width="170" height="55" rx="7" fill="rgba(30, 41, 59, 0.65)" stroke="#94a3b8"/>
+        <text x="695" y="1037" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">操作与计量工位</text>
+        <text x="695" y="1055" fill="#94a3b8" font-size="7.5" text-anchor="middle">扫码 · 称重 · 打印 · 冷链记录</text>
+
+        <rect x="810" y="1015" width="170" height="55" rx="7" fill="#0f172a"/>
+        <rect x="810" y="1015" width="170" height="55" rx="7" fill="rgba(8, 51, 68, 0.42)" stroke="#22d3ee"/>
+        <text x="895" y="1037" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">人工记录</text>
+        <text x="895" y="1055" fill="#94a3b8" font-size="7.5" text-anchor="middle">巡检 · 检验报告 · 专业确认</text>
+
+        <!-- Independent control zone -->
+        <rect x="1040" y="875" width="405" height="225" rx="14" fill="rgba(136, 19, 55, 0.06)" stroke="#fb7185" stroke-width="1.2" stroke-dasharray="7,5"/>
+        <text x="1060" y="895" fill="#fb7185" font-size="10" font-weight="600">独立安全控制通道｜不依赖云端或 AI 才能安全运行</text>
+
+        <rect x="1095" y="915" width="140" height="50" rx="7" fill="#0f172a"/>
+        <rect x="1095" y="915" width="140" height="50" rx="7" fill="rgba(136, 19, 55, 0.38)" stroke="#fb7185" stroke-width="1.4"/>
+        <text x="1165" y="936" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">本地安全控制器</text>
+        <text x="1165" y="952" fill="#94a3b8" font-size="7.2" text-anchor="middle">批准规则 · 新鲜度 · 时效校验</text>
+
+        <rect x="1070" y="1015" width="115" height="55" rx="7" fill="#0f172a"/>
+        <rect x="1070" y="1015" width="115" height="55" rx="7" fill="rgba(136, 19, 55, 0.38)" stroke="#fb7185"/>
+        <text x="1127" y="1037" fill="#f8fafc" font-size="9" font-weight="600" text-anchor="middle">探头 / 反馈</text>
+        <text x="1127" y="1055" fill="#94a3b8" font-size="7" text-anchor="middle">状态闭环</text>
+
+        <rect x="1205" y="1015" width="115" height="55" rx="7" fill="#0f172a"/>
+        <rect x="1205" y="1015" width="115" height="55" rx="7" fill="rgba(136, 19, 55, 0.38)" stroke="#fb7185"/>
+        <text x="1262" y="1037" fill="#f8fafc" font-size="9" font-weight="600" text-anchor="middle">现场执行器</text>
+        <text x="1262" y="1055" fill="#94a3b8" font-size="7" text-anchor="middle">风机 · 喷淋 · 供水</text>
+
+        <rect x="1255" y="915" width="155" height="50" rx="7" fill="#0f172a"/>
+        <rect x="1255" y="915" width="155" height="50" rx="7" fill="rgba(136, 19, 55, 0.38)" stroke="#fb7185"/>
+        <text x="1332" y="936" fill="#f8fafc" font-size="9.5" font-weight="600" text-anchor="middle">硬件联锁 / 急停</text>
+        <text x="1332" y="952" fill="#94a3b8" font-size="7.2" text-anchor="middle">现场接管优先 · 安全降级</text>
+
+        <!-- Link labels -->
+        <text x="595" y="144" fill="#22d3ee" font-size="7.5">HTTPS / 受控访问</text>
+        <text x="752" y="569" fill="#a78bfa" font-size="7.5">权威事务写入</text>
+        <text x="1050" y="725" fill="#fb923c" font-size="7.5">可重试分发</text>
+        <text x="544" y="856" fill="#22d3ee" font-size="7.5">MQTT over TLS / HTTPS · 出站加密</text>
+        <text x="1000" y="516" fill="#fb7185" font-size="7.2">仅批准配置 / 受控远程操作</text>
+        <text x="949" y="836" fill="#fbbf24" font-size="7.2">AI 建议，不直接控制</text>
+
+        <!-- Legend outside boundaries -->
+        <g transform="translate(55 1085)">
+          <text x="0" y="12" fill="#f8fafc" font-size="8.5" font-weight="600">图例</text>
+          <rect x="48" y="3" width="16" height="10" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee"/>
+          <text x="70" y="12" fill="#94a3b8" font-size="7.5">渠道/边缘</text>
+          <rect x="145" y="3" width="16" height="10" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399"/>
+          <text x="167" y="12" fill="#94a3b8" font-size="7.5">领域服务</text>
+          <rect x="242" y="3" width="16" height="10" rx="2" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa"/>
+          <text x="264" y="12" fill="#94a3b8" font-size="7.5">数据底座</text>
+          <rect x="339" y="3" width="16" height="10" rx="2" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c"/>
+          <text x="361" y="12" fill="#94a3b8" font-size="7.5">异步集成</text>
+          <rect x="446" y="3" width="16" height="10" rx="2" fill="rgba(136, 19, 55, 0.4)" stroke="#fb7185"/>
+          <text x="468" y="12" fill="#94a3b8" font-size="7.5">安全控制</text>
+          <line x1="570" y1="8" x2="596" y2="8" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+          <text x="606" y="12" fill="#94a3b8" font-size="7.5">数据/调用</text>
+          <line x1="690" y1="8" x2="716" y2="8" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#arrow-rose)"/>
+          <text x="726" y="12" fill="#94a3b8" font-size="7.5">受控配置/控制</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>核心架构决策</h3>
+        </div>
+        <ul>
+          <li>• 一期采用模块化单体，不以微服务数量衡量先进性</li>
+          <li>• 生产、经营、质量共用统一事实源，投影均可重建</li>
+          <li>• 关键交易以数据库事务提交为准，消息与页面不作成功依据</li>
+          <li>• Outbox 支撑至少一次分发，业务幂等消除重复影响</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot rose"></div>
+          <h3>安全与降级边界</h3>
+        </div>
+        <ul>
+          <li>• 本地控制器独立运行，硬件联锁、急停与人工接管优先</li>
+          <li>• AI 只形成建议或工单，不直接获得执行器控制权限</li>
+          <li>• 质量放行、解冻和正式出库禁止离线最终批准</li>
+          <li>• 公众服务、运维网络、视频网络与现场控制网络隔离</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>弱网与可接管设计</h3>
+        </div>
+        <ul>
+          <li>• 边缘持久化队列按实际速率验证建议不少于 72 小时</li>
+          <li>• 现场记录区分本机保存、中心接收和业务确认三种状态</li>
+          <li>• 视频优先本地留存，关键事件片段按策略上传</li>
+          <li>• 数据、附件、字典、配置和未结事项均可完整导出接管</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>一期扩展原则</h3>
+        </div>
+        <ul>
+          <li>• 穿戴、视频 AI 和独立时序库均在场测或容量达阈值后扩展</li>
+          <li>• 专用图库只是事实库的可重建投影，不成为第二事实源</li>
+          <li>• 第三方存证属于可选适配，失败不得阻断核心交易</li>
+          <li>• 无法证明增量价值时保留低成本台账与规则基线</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="footer">依据《梅花鹿智慧养殖技术方案设计 V2》生成 · 架构口径：一期总体设计 · 2026-09-29</p>
+  </div>
+
+  <script>
+    async function copyAsImage(btn) {
+      const orig = btn.textContent;
+      try {
+        const el = document.getElementById("report-container");
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: "#020617", scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains("toolbar"), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        btn.textContent = "✓ Copied!";
+      } catch (e) {
+        btn.textContent = "✗ Failed";
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+
+    async function downloadPNG(btn) {
+      const orig = btn.textContent;
+      btn.textContent = "⏳ ...";
+      try {
+        const el = document.getElementById("report-container");
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: "#020617", scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains("toolbar"), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const link = document.createElement("a");
+        link.download = "梅花鹿智慧养殖系统架构图_v2.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        btn.textContent = "✓ Done!";
+      } catch (e) {
+        btn.textContent = "✗ Failed";
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+
+    async function downloadPDF(btn) {
+      const orig = btn.textContent;
+      btn.textContent = "⏳ ...";
+      try {
+        const el = document.getElementById("report-container");
+        const r = el.getBoundingClientRect();
+        const pad = 32;
+        const canvas = await html2canvas(document.body, { backgroundColor: "#020617", scale: 2, useCORS: true, ignoreElements: (e) => e.classList && e.classList.contains("toolbar"), x: r.left + window.scrollX - pad, y: r.top + window.scrollY - pad, width: r.width + pad * 2, height: r.height + pad * 2 });
+        const imgData = canvas.toDataURL("image/png");
+        const { jsPDF } = window.jspdf;
+        const orientation = canvas.width > canvas.height ? "landscape" : "portrait";
+        const pdf = new jsPDF({ orientation, unit: "px", format: [canvas.width, canvas.height], hotfixes: ["px_scaling"] });
+        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+        pdf.save("梅花鹿智慧养殖系统架构图_v2.pdf");
+        btn.textContent = "✓ Done!";
+      } catch (e) {
+        btn.textContent = "✗ Failed";
+      }
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
+  </script>
+</body>
+</html>
