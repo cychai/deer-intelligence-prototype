@@ -12,7 +12,7 @@
     return 'neutral';
   };
   const badge = (value) => `<span class="badge ${tone(String(value))}">${esc(value)}</span>`;
-  const spark = (values, color = '#68d391') => {
+  const spark = (values, color = '#1677ff') => {
     const width = 240, height = 64;
     const max = Math.max(...values), min = Math.min(...values);
     const pts = values.map((v, i) => {
@@ -53,25 +53,25 @@
     return `<div class="site-map">
       <svg viewBox="0 0 720 360" role="img" aria-label="模拟场区态势">
         <defs>
-          <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#132b22"/><stop offset="1" stop-color="#081713"/></linearGradient>
+          <linearGradient id="land" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4f7fb"/><stop offset="1" stop-color="#e7eef7"/></linearGradient>
           <filter id="glow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-        <path d="M10 278C96 218 150 306 238 254s140-20 205-70 126-56 267-10v176H10Z" fill="url(#land)" stroke="#345244"/>
+        <path d="M10 278C96 218 150 306 238 254s140-20 205-70 126-56 267-10v176H10Z" fill="url(#land)" stroke="#c4d1df"/>
         <path class="contour" d="M20 270c90-50 145 30 225-24s136-12 204-68 155-43 245-11M24 302c92-45 154 18 235-28s135-15 203-67 156-38 232-16"/>
         <path class="data-route" d="M105 95 C220 32 395 54 548 183 S622 286 677 276"/>
         ${pens.map((p, i) => {
           const [x, y] = coords[i];
-          const c = tone(p.state) === 'danger' ? '#f87171' : tone(p.state) === 'warning' ? '#f6c768' : '#68d391';
+          const c = tone(p.state) === 'danger' ? '#d92d20' : tone(p.state) === 'warning' ? '#d97706' : '#26864a';
           return `<g class="map-node" data-action="pen-detail" data-id="${p.id}" tabindex="0">
             <circle cx="${x + 45}" cy="${y + 30}" r="36" fill="${c}" opacity=".08"/>
-            <rect x="${x}" y="${y}" width="90" height="60" rx="8" fill="#0c1b17" stroke="${c}" stroke-width="1.4"/>
+            <rect x="${x}" y="${y}" width="90" height="60" rx="8" fill="#ffffff" stroke="${c}" stroke-width="1.4"/>
             <circle cx="${x + 76}" cy="${y + 13}" r="4" fill="${c}" filter="url(#glow)" class="${p.state === '告警' ? 'pulse-ring' : ''}"/>
-            <text x="${x + 12}" y="${y + 22}" fill="#e9f3ed" font-size="11" font-weight="700">${p.id}</text>
-            <text x="${x + 12}" y="${y + 40}" fill="#8da89b" font-size="8">${p.count} 头 · ${p.state}</text>
+            <text x="${x + 12}" y="${y + 22}" fill="#26364d" font-size="11" font-weight="700">${p.id}</text>
+            <text x="${x + 12}" y="${y + 40}" fill="#667085" font-size="8">${p.count} 头 · ${p.state}</text>
             <text x="${x + 12}" y="${y + 53}" fill="${c}" font-size="8">${p.temp}℃ / ${p.humidity}%RH</text>
           </g>`;
         }).join('')}
-        <g transform="translate(575 55)"><rect width="112" height="72" rx="10" fill="#0c1b17" stroke="#b98b52"/><text x="14" y="24" fill="#e9f3ed" font-size="11" font-weight="700">采茸工位</text><text x="14" y="43" fill="#a68b6a" font-size="8">秤 / 扫码 / 打印</text><text x="14" y="58" fill="#68d391" font-size="8">设备准备完成</text></g>
+        <g transform="translate(575 55)"><rect width="112" height="72" rx="10" fill="#ffffff" stroke="#d97706"/><text x="14" y="24" fill="#26364d" font-size="11" font-weight="700">采茸工位</text><text x="14" y="43" fill="#8a611c" font-size="8">秤 / 扫码 / 打印</text><text x="14" y="58" fill="#26864a" font-size="8">设备准备完成</text></g>
       </svg>
       <div class="map-legend"><span><i class="dot ok"></i>正常</span><span><i class="dot warn"></i>关注</span><span><i class="dot bad"></i>告警/受控</span><em>点击区域进入事实明细</em></div>
     </div>`;
@@ -83,13 +83,13 @@
       ['资金', 76, 250, 28], ['数据', 28, 137, 18],
     ];
     return `<div class="radar-wrap"><svg viewBox="0 0 240 280" aria-label="风险雷达">
-      <g class="radar-grid" transform="translate(120 145)" fill="none" stroke="#29463a">
+      <g class="radar-grid" transform="translate(120 145)" fill="none" stroke="#d5dde7">
         <polygon points="0,-95 90,-29 56,77 -56,77 -90,-29"/><polygon points="0,-67 63,-20 39,54 -39,54 -63,-20"/><polygon points="0,-38 36,-12 23,31 -23,31 -36,-12"/>
         <path d="M0-95V0M90-29L0 0M56 77L0 0M-56 77L0 0M-90-29L0 0"/>
-        <polygon class="radar-shape" points="0,-62 56,-18 31,43 -28,38 -48,-16" fill="rgba(246,199,104,.18)" stroke="#f6c768" stroke-width="2"/>
+        <polygon class="radar-shape" points="0,-62 56,-18 31,43 -28,38 -48,-16" fill="rgba(22,119,255,.15)" stroke="#1677ff" stroke-width="2"/>
         <circle class="radar-vertex" cx="0" cy="-62" r="3"/><circle class="radar-vertex" cx="56" cy="-18" r="3"/><circle class="radar-vertex" cx="31" cy="43" r="3"/><circle class="radar-vertex" cx="-28" cy="38" r="3"/><circle class="radar-vertex" cx="-48" cy="-16" r="3"/>
       </g>
-      ${axes.map(([label, x, y]) => `<text x="${x}" y="${y}" text-anchor="middle" fill="#b7c8be" font-size="10">${label}</text>`).join('')}
+      ${axes.map(([label, x, y]) => `<text x="${x}" y="${y}" text-anchor="middle" fill="#667085" font-size="10">${label}</text>`).join('')}
     </svg><div class="risk-summary"><b>2</b><span>需管理层关注</span><small>质量限制 · 设备波动</small></div></div>`;
   }
 
@@ -115,8 +115,8 @@
         ${panel('生产节奏', `<div class="calendar-list">${D.calendar.map((x, i) => `<button data-view-jump="${i < 3 ? ['production', 'breeding', 'health'][i] : i === 3 ? 'farmers' : 'assets'}"><time>${x.day}</time><div><b>${x.title}</b><span>${x.owner}</span></div>${badge(x.type)}</button>`).join('')}</div>`, { className: 'span-4', kicker: 'PRODUCTION RHYTHM' })}
         ${panel('实时业务流', `<div class="event-stream">${D.events.map((x) => `<button data-action="event-detail" data-id="${x.time}"><time>${x.time}</time><i class="${x.tone}"></i><div><b>${x.type}</b><span>${x.text}</span><small>${x.source}</small></div></button>`).join('')}</div>`, { className: 'span-4', kicker: 'FACT STREAM' })}
         ${panel('双线经营视图', `<div class="dual-track">
-          <button data-view-jump="production"><span>养殖执行线</span><b>93%</b>${spark(D.dashboardSeries.production, '#68d391')}<small>任务按期完成率 · 模拟</small></button>
-          <button data-view-jump="assets"><span>经营管理线</span><b>11.2</b>${spark(D.dashboardSeries.cash, '#f6c768')}<small>累计回款情景 / 万元</small></button>
+          <button data-view-jump="production"><span>养殖执行线</span><b>93%</b>${spark(D.dashboardSeries.production, '#1677ff')}<small>任务按期完成率 · 模拟</small></button>
+          <button data-view-jump="assets"><span>经营管理线</span><b>11.2</b>${spark(D.dashboardSeries.cash, '#d97706')}<small>累计回款情景 / 万元</small></button>
         </div>`, { className: 'span-4', kicker: 'TWO OPERATING LINES' })}
       </div>`;
   }
@@ -176,7 +176,7 @@
       '<button class="secondary-button" data-action="control-audit">控制审计</button><button class="primary-button" data-action="propose-config">提交批准配置</button>')}
       <div class="metric-grid compact">${metric('关键点位', 24, '个', '示范场测算情景')}${metric('有效数据率', 99.2, '%', '最差点位单列')}${metric('边缘积压', 126, '条', '正在幂等补传', 'warning')}${metric('校准到期', 2, '台', '30 天内', 'warning')}</div>
       <div class="content-grid">
-        ${panel('圈舍环境趋势', `<div class="trend-panel"><div class="trend-value"><span>A3 相对湿度</span><b>82<em>%RH</em></b>${badge('关注')}</div>${spark([66, 68, 69, 71, 72, 74, 76, 82, 80, 77, 73, 71], '#f6c768')}<div class="axis-labels"><span>08:40</span><span>09:10</span><span>09:42</span></div></div>`, { className: 'span-4', kicker: 'ENVIRONMENT TREND' })}
+        ${panel('圈舍环境趋势', `<div class="trend-panel"><div class="trend-value"><span>A3 相对湿度</span><b>82<em>%RH</em></b>${badge('关注')}</div>${spark([66, 68, 69, 71, 72, 74, 76, 82, 80, 77, 73, 71], '#d97706')}<div class="axis-labels"><span>08:40</span><span>09:10</span><span>09:42</span></div></div>`, { className: 'span-4', kicker: 'ENVIRONMENT TREND' })}
         ${panel('安全控制优先级', `<div class="control-stack"><div class="critical">硬件保护 / 急停 / 安全联锁</div><div>授权现场人工接管</div><div>批准的本地自动规则</div><div class="muted">受控远程配置（非直接云控）</div></div><p class="boundary-note">AI 建议只生成工单，不进入执行器控制链。</p>`, { className: 'span-4', kicker: 'CONTROL BOUNDARY' })}
         ${panel('边缘运行', `<div class="edge-health"><div><span>持久化队列</span><b>126 / 72h 容量</b>${progress(18)}</div><div><span>视频本地存储</span><b>4.2 TB 可用</b>${progress(58)}</div><div><span>中心连接</span><b>已恢复</b>${progress(96)}</div></div>`, { className: 'span-4', kicker: 'EDGE AUTONOMY' })}
       </div>
@@ -227,8 +227,8 @@
       '<button class="secondary-button" data-action="reconcile">发起对账</button><button class="primary-button" data-action="export-summary">导出演示摘要</button>')}
       <div class="metric-grid compact">${metric('生物资产账面', 642.8, '万元', '模拟估值，不是审计结果')}${metric('订单金额', 20.7, '万元', '本期样例')}${metric('已回款', 12.4, '万元', '预测与实际分栏')}${metric('预算偏差', 6.8, '%', '设备维护高于情景', 'warning')}</div>
       <div class="content-grid">
-        ${panel('现金与订单', `<div class="big-chart">${spark(D.dashboardSeries.cash, '#f6c768')}<div class="chart-marks"><span>模拟累计回款（万元）</span><b>11.2</b></div></div>`, { className: 'span-5', kicker: 'CASH COLLECTION' })}
-        ${panel('成本结构', `<div class="donut-wrap"><div class="donut" style="--a:28;--b:46;--c:64;--d:82"><span><b>100%</b><small>情景成本</small></span></div><div class="legend-list"><span><i style="background:#68d391"></i>直接投入 28%</span><span><i style="background:#4ba187"></i>人员 18%</span><span><i style="background:#f6c768"></i>设备运维 18%</span><span><i style="background:#b98b52"></i>检测物流 18%</span><span><i style="background:#536b60"></i>其他 18%</span></div></div>`, { className: 'span-7', kicker: 'COST STRUCTURE' })}
+        ${panel('现金与订单', `<div class="big-chart">${spark(D.dashboardSeries.cash, '#d97706')}<div class="chart-marks"><span>模拟累计回款（万元）</span><b>11.2</b></div></div>`, { className: 'span-5', kicker: 'CASH COLLECTION' })}
+        ${panel('成本结构', `<div class="donut-wrap"><div class="donut" style="--a:28;--b:46;--c:64;--d:82"><span><b>100%</b><small>情景成本</small></span></div><div class="legend-list"><span><i style="background:#1677ff"></i>直接投入 28%</span><span><i style="background:#69a9ff"></i>人员 18%</span><span><i style="background:#f59e0b"></i>设备运维 18%</span><span><i style="background:#7f8fa3"></i>检测物流 18%</span><span><i style="background:#d5dce5"></i>其他 18%</span></div></div>`, { className: 'span-7', kicker: 'COST STRUCTURE' })}
       </div>
       ${panel('订单与回款', table(columns, D.orders, 'order-detail'), { kicker: 'ORDERS & RECEIVABLES' })}`;
   }
@@ -255,10 +255,10 @@
       '<button class="secondary-button" data-action="reporting-status">报送状态</button><button class="primary-button" data-action="export-ledger">导出监管台账</button>')}
       <div class="analysis-grid">
         ${panel('存栏滚动', `<div class="equation"><span>期初 780</span><b>+</b><span>出生 5</span><b>+</b><span>调入 2</span><b>−</b><span>调出 1</span><b>=</b><strong>期末 786</strong></div><p class="chart-note">内部跨圈转移不改变全场存栏。</p>`, { className: 'span-6', kicker: 'HERD RECONCILIATION' })}
-        ${panel('生产完成率', `<div class="big-chart">${spark(D.dashboardSeries.production, '#68d391')}<div class="chart-marks"><span>按期完成率</span><b>93%</b></div></div>`, { className: 'span-6', kicker: 'PRODUCTION' })}
-        ${panel('健康事件', `<div class="big-chart">${spark(D.dashboardSeries.health, '#f87171')}<div class="chart-marks"><span>每 100 鹿日待核事件</span><b>0.7</b></div></div>`, { className: 'span-4', kicker: 'HEALTH' })}
-        ${panel('环境趋势', `<div class="big-chart">${spark(D.dashboardSeries.environment, '#60a5fa')}<div class="chart-marks"><span>A 区温度均值</span><b>22.4℃</b></div></div>`, { className: 'span-4', kicker: 'ENVIRONMENT' })}
-        ${panel('订单回款', `<div class="big-chart">${spark(D.dashboardSeries.cash, '#f6c768')}<div class="chart-marks"><span>回款率</span><b>59.9%</b></div></div>`, { className: 'span-4', kicker: 'CASH' })}
+        ${panel('生产完成率', `<div class="big-chart">${spark(D.dashboardSeries.production, '#1677ff')}<div class="chart-marks"><span>按期完成率</span><b>93%</b></div></div>`, { className: 'span-6', kicker: 'PRODUCTION' })}
+        ${panel('健康事件', `<div class="big-chart">${spark(D.dashboardSeries.health, '#d92d20')}<div class="chart-marks"><span>每 100 鹿日待核事件</span><b>0.7</b></div></div>`, { className: 'span-4', kicker: 'HEALTH' })}
+        ${panel('环境趋势', `<div class="big-chart">${spark(D.dashboardSeries.environment, '#1677ff')}<div class="chart-marks"><span>A 区温度均值</span><b>22.4℃</b></div></div>`, { className: 'span-4', kicker: 'ENVIRONMENT' })}
+        ${panel('订单回款', `<div class="big-chart">${spark(D.dashboardSeries.cash, '#d97706')}<div class="chart-marks"><span>回款率</span><b>59.9%</b></div></div>`, { className: 'span-4', kicker: 'CASH' })}
         ${panel('指标定义与事实来源', `<div class="definition-list"><button data-action="metric-detail" data-id="herd"><b>期末存栏</b><span>已确认出生/调入/调出/死亡事件</span><em>事务事实</em></button><button data-action="metric-detail" data-id="response"><b>工单响应</b><span>首次受理时间 − 告警生成时间</span><em>事件日志</em></button><button data-action="metric-detail" data-id="collection"><b>回款率</b><span>实际回执金额 / 到期应收金额</span><em>经营事实</em></button></div>`, { className: 'span-12', kicker: 'TRACEABLE METRICS' })}
       </div>`;
   }
