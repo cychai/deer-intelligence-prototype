@@ -3,10 +3,10 @@
 
   const data = {
     meta: {
-      version: 'V2.0',
+      version: 'V2.1',
       site: '蒙阴·玉皇山良种繁育基地',
-      dataDate: '2026-09-29',
-      notice: '固定模拟样例，不代表实际存栏、收入、设备效果或审批结论',
+      dataDate: '2026-10-20',
+      notice: '1600 头规模固定测算样例，不代表实际存栏、收入、设备效果或审批结论',
     },
     nav: {
       dashboard: '综合大屏',
@@ -22,8 +22,49 @@
       foundation: '技术底座',
     },
     scenarios: {
-      800: { herd: 786, female: 468, male: 182, young: 136, farmers: 10, capacity: 800 },
-      1600: { herd: 1542, female: 924, male: 352, young: 266, farmers: 18, capacity: 1600 },
+      1600: {
+        herd: 1600,
+        female: 1000,
+        male: 550,
+        breedingMale: 50,
+        annualFawns: 680,
+        capacity: 1600,
+      },
+    },
+    investmentPlan: {
+      unit: '万元',
+      startup: {
+        housing: 350,
+        deer: 2150,
+        total: 2500,
+      },
+      assumptions: {
+        femalePurchase: 8000,
+        breedingMalePurchase: 50000,
+        malePurchase: 20000,
+        femaleBreedingRate: 85,
+        fawnSurvivalRate: 80,
+        sexRatio: 50,
+        femaleCullRate: 8,
+        maleCullRate: 10,
+        femaleAnnualCost: 2000,
+        maleAnnualCost: 3000,
+        fawnAnnualCost: 1000,
+        managementRate: 5,
+        antlerYieldPerMale: 4,
+        antlerPricePerKg: 2000,
+        breedingFemaleSaleRate: 30,
+        breedingFemalePrice: 8000,
+        breedingMalePrice: 12000,
+      },
+      years: [
+        { year: 1, herd: 2280, female: 1000, male: 550, breedingMale: 50, newborn: 680, accumulatedFawns: 680, breedingCost: 380, managementCost: 125, totalExpense: 505, maleAntlerKg: 2400, fawnAntlerKg: 0, antlerRevenue: 480, breedingDeerRevenue: 0, totalRevenue: 480, netRevenue: -25 },
+        { year: 2, herd: 2960, female: 1000, male: 550, breedingMale: 50, newborn: 680, accumulatedFawns: 1360, breedingCost: 448, managementCost: 125, totalExpense: 573, maleAntlerKg: 2400, fawnAntlerKg: 170, antlerRevenue: 514, breedingDeerRevenue: 0, totalRevenue: 514, netRevenue: -59 },
+        { year: 3, herd: 3871, female: 1340, male: 890, breedingMale: 50, newborn: 911, accumulatedFawns: 1591, breedingCost: 516, managementCost: 125, totalExpense: 641, maleAntlerKg: 2400, fawnAntlerKg: 850, antlerRevenue: 650, breedingDeerRevenue: 257, totalRevenue: 907, netRevenue: 266 },
+        { year: 4, herd: 4473, female: 1358, male: 1230, breedingMale: 50, newborn: 924, accumulatedFawns: 1835, breedingCost: 709, managementCost: 125, totalExpense: 834, maleAntlerKg: 3760, fawnAntlerKg: 908, antlerRevenue: 934, breedingDeerRevenue: 261, totalRevenue: 1194, netRevenue: 360 },
+        { year: 5, herd: 5159, female: 1488, male: 1686, breedingMale: 50, newborn: 1012, accumulatedFawns: 1936, breedingCost: 839, managementCost: 125, totalExpense: 964, maleAntlerKg: 5120, fawnAntlerKg: 1142, antlerRevenue: 1252, breedingDeerRevenue: 286, totalRevenue: 1538, netRevenue: 574 },
+        { year: 6, herd: 5885, female: 1593, male: 2147, breedingMale: 50, newborn: 1083, accumulatedFawns: 2095, breedingCost: 1012, managementCost: 125, totalExpense: 1137, maleAntlerKg: 6942, fawnAntlerKg: 1177, antlerRevenue: 1624, breedingDeerRevenue: 306, totalRevenue: 1930, netRevenue: 793 },
+      ],
     },
     deer: [
       { id: 'MY-D-0028', name: '玉华028', sex: '母', age: '4岁2月', pen: '繁育舍 A2', purpose: '核心种用', status: '重点观察', source: '合法引种批次 IN-2024-03', father: 'MY-M-0012', mother: 'MY-F-0104', parentStatus: '已确认', score: 91.6, weight: 128.4, events: ['2026-09-29 活动趋势下降，规则触发待核实', '2026-09-03 妊检记录：待复查', '2026-05-16 性能测定完成'] },
@@ -33,11 +74,11 @@
       { id: 'MY-F-0156', name: '松露156', sex: '母', age: '1岁9月', pen: '后备舍 C1', purpose: '后备种用', status: '正常', source: '基地出生', father: '未知', mother: 'MY-F-0109', parentStatus: '父本未知', score: 82.1, weight: 97.5, events: ['2026-09-22 性能测定完成', '2026-04-11 断奶事件确认'] },
     ],
     pens: [
-      { id: 'A1', name: '繁育舍 A1', type: '核心繁育', count: 68, capacity: 80, temp: 21.8, humidity: 66, state: '正常', water: '已巡检', disinfect: '已完成', owner: '王秀兰' },
-      { id: 'A2', name: '繁育舍 A2', type: '核心繁育', count: 72, capacity: 80, temp: 23.6, humidity: 79, state: '关注', water: '已巡检', disinfect: '待完成', owner: '李金海' },
-      { id: 'A3', name: '繁育舍 A3', type: '核心繁育', count: 64, capacity: 80, temp: 22.9, humidity: 82, state: '告警', water: '待巡检', disinfect: '已完成', owner: '周晓梅' },
-      { id: 'B1', name: '产茸舍 B1', type: '产茸公鹿', count: 96, capacity: 110, temp: 22.2, humidity: 68, state: '正常', water: '已巡检', disinfect: '已完成', owner: '张永刚' },
-      { id: 'B3', name: '普通舍 B3', type: '普通饲养', count: 104, capacity: 120, temp: 23.1, humidity: 70, state: '正常', water: '已巡检', disinfect: '已完成', owner: '赵晓' },
+      { id: 'A1', name: '繁育舍 A1', type: '核心母鹿', count: 330, capacity: 360, temp: 21.8, humidity: 66, state: '正常', water: '已巡检', disinfect: '已完成', owner: '王秀兰' },
+      { id: 'A2', name: '繁育舍 A2', type: '核心母鹿', count: 330, capacity: 360, temp: 23.6, humidity: 79, state: '关注', water: '已巡检', disinfect: '待完成', owner: '李金海' },
+      { id: 'A3', name: '繁育舍 A3', type: '核心母鹿', count: 333, capacity: 360, temp: 22.9, humidity: 82, state: '告警', water: '待巡检', disinfect: '已完成', owner: '周晓梅' },
+      { id: 'B1', name: '种公鹿舍 B1', type: '核心种公鹿', count: 50, capacity: 80, temp: 22.2, humidity: 68, state: '正常', water: '已巡检', disinfect: '已完成', owner: '张永刚' },
+      { id: 'B3', name: '公鹿舍 B3', type: '产茸公鹿', count: 550, capacity: 600, temp: 23.1, humidity: 70, state: '正常', water: '已巡检', disinfect: '已完成', owner: '赵晓' },
       { id: 'Q1', name: '隔离舍 Q1', type: '隔离观察', count: 7, capacity: 16, temp: 22.0, humidity: 65, state: '受控', water: '已巡检', disinfect: '已完成', owner: '陈牧' },
     ],
     tasks: [
@@ -103,7 +144,10 @@
     dashboardSeries: {
       health: [8, 12, 9, 14, 10, 7, 11, 6, 8, 5, 7, 4],
       environment: [21.2, 21.4, 21.8, 22.1, 22.6, 23.2, 23.6, 23.4, 22.9, 22.4, 22.1, 21.9],
-      cash: [12, 18, 26, 31, 43, 48, 61, 66, 78, 86, 94, 112],
+      herd: [1600, 2280, 2960, 3871, 4473, 5159, 5885],
+      revenue: [480, 514, 907, 1194, 1538, 1930],
+      expense: [505, 573, 641, 834, 964, 1137],
+      profit: [-25, -59, 266, 360, 574, 793],
       production: [58, 64, 69, 72, 76, 81, 79, 84, 88, 91, 89, 93],
     },
   };

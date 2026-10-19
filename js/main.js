@@ -3,10 +3,10 @@
 
   const D = window.DEER_DATA;
   const V = window.DEER_VIEWS;
-  const STORAGE_KEY = 'deer-demo-state-v2';
+  const STORAGE_KEY = 'deer-demo-state-v3';
   const defaultState = {
     view: 'dashboard',
-    scenario: 800,
+    scenario: 1600,
     sidebarCollapsed: false,
     selectedAlert: null,
     workOrders: [],
@@ -42,7 +42,9 @@
   function loadState() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      return saved && typeof saved === 'object' ? { ...defaultState, ...saved } : { ...defaultState };
+      return saved && typeof saved === 'object'
+        ? { ...defaultState, ...saved, scenario: 1600 }
+        : { ...defaultState };
     } catch (error) {
       return { ...defaultState };
     }
@@ -60,7 +62,7 @@
     applySidebarState();
     main.innerHTML = V.render(state.view, state);
     title.textContent = D.nav[state.view] || D.nav.dashboard;
-    scenarioLabel.textContent = `${state.scenario} 头`;
+    scenarioLabel.textContent = `${Number(state.scenario).toLocaleString('zh-CN')} 头`;
     document.querySelectorAll('.nav-item').forEach((item) => item.classList.toggle('active', item.dataset.view === state.view));
     wireTableFilter();
     animateNumbers();
@@ -373,10 +375,15 @@
     if (action === 'close-modal') return closeModal();
     if (action === 'toggle-sidebar') return toggleSidebar();
     if (action === 'scenario') {
-      state.scenario = state.scenario === 800 ? 1600 : 800;
-      saveState();
-      render();
-      return toast('容量情景已切换', `当前为 ${state.scenario} 头测算情景，不代表批准规模。`);
+      const assumptions = D.investmentPlan.assumptions;
+      return simpleDetail('1600 头测算基准', '平台运营数据已统一采用截图中的 1600 头项目测算口径。', detailGrid([
+        ['初始母鹿', '1,000 头'],
+        ['初始普通公鹿', '550 头'],
+        ['初始种公鹿', '50 头'],
+        ['母鹿繁殖率', `${assumptions.femaleBreedingRate}%`],
+        ['仔鹿成活率', `${assumptions.fawnSurvivalRate}%`],
+        ['鹿茸均价', `¥ ${assumptions.antlerPricePerKg.toLocaleString('zh-CN')} / kg`],
+      ]));
     }
     if (action === 'alert-detail') return alertDetail(id);
     if (action === 'create-workorder') return createWorkOrder(id);

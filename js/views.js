@@ -46,6 +46,24 @@
     <tbody>${rows.map((row) => `<tr>${columns.map((c) => `<td>${c.render ? c.render(row[c.key], row) : esc(row[c.key])}</td>`).join('')}
     <td class="row-action">${rowAction ? `<button class="text-button" data-action="${rowAction}" data-id="${esc(row.id)}">查看 →</button>` : ''}</td></tr>`).join('')}</tbody></table></div>`;
   const progress = (value, label) => `<div class="progress"><i style="width:${Math.max(0, Math.min(100, value))}%"></i></div>${label ? `<small>${esc(label)}</small>` : ''}`;
+  const money = (value) => Number(value).toLocaleString('zh-CN');
+  const projectionTable = () => {
+    const years = D.investmentPlan.years;
+    const rows = [
+      ['鹿群总数量', '头', 'herd'],
+      ['母鹿数量', '头', 'female'],
+      ['公鹿数量', '头', 'male'],
+      ['当年生产仔鹿', '头', 'newborn'],
+      ['养殖费', '万元', 'breedingCost', 'cost'],
+      ['鹿茸收益', '万元', 'antlerRevenue', 'revenue'],
+      ['淘汰种鹿收益', '万元', 'breedingDeerRevenue', 'revenue'],
+      ['总收益', '万元', 'totalRevenue', 'revenue'],
+      ['总支出', '万元', 'totalExpense', 'cost'],
+      ['净收益', '万元', 'netRevenue', 'net'],
+    ];
+    return `<div class="table-wrap projection-table"><table><thead><tr><th>核心指标</th><th>单位</th>${years.map((x) => `<th>第${x.year}年</th>`).join('')}</tr></thead>
+      <tbody>${rows.map(([label, unit, key, cls = '']) => `<tr class="${cls}"><td><b>${label}</b></td><td>${unit}</td>${years.map((x) => `<td class="mono">${money(x[key])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  };
 
   function siteMap() {
     const pens = D.pens;
@@ -94,20 +112,20 @@
   }
 
   function dashboard(state) {
-    const s = D.scenarios[state.scenario];
-    const openTasks = D.tasks.filter((x) => x.status !== '已完成').length;
-    const restricted = D.inventory.filter((x) => x.quality !== '已放行').length;
-    const paid = D.orders.reduce((sum, x) => sum + x.paid, 0);
-    return `${pageHead('YUHuang Mountain / Operation Center', '良种繁育基地 · 综合态势', '以统一事实源汇总生产、健康、质量、经营与联农状态；所有数字均为演示样例。',
-      '<button class="secondary-button" data-action="tour">开始演示导览</button><button class="primary-button" data-view-jump="foundation">查看技术底座</button>')}
-      <div class="notice-banner reveal"><span>演示数据</span><p>当前展示 ${state.scenario} 头容量测算情景，不代表已批准引种规模或真实运营结果。</p><button data-action="scenario">切换情景</button></div>
+    const s = D.scenarios[1600];
+    const plan = D.investmentPlan;
+    const year1 = plan.years[0];
+    const year6 = plan.years[5];
+    return `${pageHead('YUHuang Mountain / Operation Center', '良种繁育基地 · 综合态势', '以 1600 头项目测算为统一口径，汇总生产、健康、质量与六年经营预测。',
+      '<button class="secondary-button" data-action="tour">开始演示导览</button><button class="primary-button" data-view-jump="assets">查看经营测算</button>')}
+      <div class="notice-banner reveal"><span>测算数据</span><p>当前统一采用 1600 头启动规模；经营数据来自项目测算，不代表已批准规模或实际运营结果。</p><button data-action="scenario">查看口径</button></div>
       <div class="metric-grid">
-        ${metric('模拟在栏', s.herd, '头', `容量情景 ${s.capacity} 头`, 'accent')}
-        ${metric('今日待办', openTasks, '项', '高优先级 2 项')}
-        ${metric('待复核告警', D.alerts.filter((x) => x.status !== '已关闭').length, '条', 'AI/规则仅生成待核建议', 'warning')}
-        ${metric('受限对象', restricted, '批', '未放行或存在活动限制', 'danger')}
-        ${metric('模拟已回款', (paid / 10000).toFixed(1), '万元', '经营预测与实际分栏')}
-        ${metric('合作户试点', s.farmers, '户', '实际开户须经准入批准')}
+        ${metric('启动鹿群', s.herd, '头', '母鹿 1,000 · 公鹿 550 · 种公鹿 50', 'accent')}
+        ${metric('启动投入', plan.startup.total, '万元', '鹿舍 350 · 鹿群 2,150')}
+        ${metric('首年仔鹿', year1.newborn, '头', '繁殖率 85% · 成活率 80%')}
+        ${metric('首年鹿茸收益', year1.antlerRevenue, '万元', '公鹿茸 2,400 kg')}
+        ${metric('第六年鹿群', year6.herd, '头', `较启动增长 ${money(year6.herd - s.herd)} 头`)}
+        ${metric('第六年净收益', year6.netRevenue, '万元', '测算总收益 1,930 万元')}
       </div>
       <div class="dashboard-grid">
         ${panel('场区态势', siteMap(), { className: 'span-8 map-panel', kicker: 'SITE OPERATIONS', action: '<button class="text-button" data-view-jump="environment">环境设备 →</button>' })}
@@ -116,7 +134,7 @@
         ${panel('实时业务流', `<div class="event-stream">${D.events.map((x) => `<button data-action="event-detail" data-id="${x.time}"><time>${x.time}</time><i class="${x.tone}"></i><div><b>${x.type}</b><span>${x.text}</span><small>${x.source}</small></div></button>`).join('')}</div>`, { className: 'span-4', kicker: 'FACT STREAM' })}
         ${panel('双线经营视图', `<div class="dual-track">
           <button data-view-jump="production"><span>养殖执行线</span><b>93%</b>${spark(D.dashboardSeries.production, '#1677ff')}<small>任务按期完成率 · 模拟</small></button>
-          <button data-view-jump="assets"><span>经营管理线</span><b>11.2</b>${spark(D.dashboardSeries.cash, '#d97706')}<small>累计回款情景 / 万元</small></button>
+          <button data-view-jump="assets"><span>六年净收益</span><b>793</b>${spark(D.dashboardSeries.profit, '#d97706')}<small>第六年测算 / 万元</small></button>
         </div>`, { className: 'span-4', kicker: 'TWO OPERATING LINES' })}
       </div>`;
   }
@@ -158,7 +176,7 @@
     ];
     return `${pageHead('BREEDING PROGRAM', '良种繁育', '以永久身份、亲本证据、性能测定和繁育事件支持可复核的选留与种鹿交付。',
       '<button class="secondary-button" data-action="pedigree-rule">选配规则</button><button class="primary-button" data-action="create-match">生成待审核选配建议</button>')}
-      <div class="metric-grid compact">${metric('核心种用', 214, '头', '模拟分群口径')}${metric('亲本已确认', 81, '%', '未知与候选单独保留')}${metric('妊检窗口', 36, '头', '10月2日开始')}${metric('待测定', 18, '头', '按年龄阶段排程')}</div>
+      <div class="metric-grid compact">${metric('初始母鹿', 1000, '头', '1600 头启动测算')}${metric('初始种公鹿', 50, '头', '平均采购价 5 万元/头')}${metric('首年生产仔鹿', 680, '头', '繁殖率 85% · 成活率 80%')}${metric('公母比例', 50, '%', '仔鹿公母各 50%')}</div>
       ${panel('个体档案与系谱', table(columns, D.deer, 'deer-detail'), { kicker: 'ANIMAL MASTER DATA', action: '<label class="inline-search"><input data-filter-table placeholder="筛选鹿号或名称"></label>' })}
       <div class="content-grid lower">
         ${panel('繁育日历', `<div class="timeline">${D.calendar.slice(1, 4).map((x) => `<div><time>${x.day}</time><i></i><p><b>${x.title}</b><span>${x.owner}</span></p></div>`).join('')}</div>`, { className: 'span-5', kicker: 'BREEDING CALENDAR' })}
@@ -217,20 +235,25 @@
   }
 
   function assets() {
+    const plan = D.investmentPlan;
+    const years = plan.years;
+    const year1 = years[0];
+    const year6 = years[5];
     const columns = [
       { key: 'id', label: '订单' }, { key: 'customer', label: '客户' }, { key: 'product', label: '交付对象' },
       { key: 'amount', label: '订单金额', render: (v) => `¥ ${Number(v).toLocaleString('zh-CN')}` },
       { key: 'paid', label: '已回款', render: (v) => `¥ ${Number(v).toLocaleString('zh-CN')}` },
       { key: 'quality', label: '交付条件', render: (v) => badge(v) }, { key: 'status', label: '状态', render: (v) => badge(v) },
     ];
-    return `${pageHead('ASSET & OPERATIONS', '资产经营', '生物资产、设备资产、订单、回款、成本和预算偏差统一分析，但不替代法定会计系统。',
+    return `${pageHead('ASSET & OPERATIONS', '资产经营', '按 1600 头启动规模展示六年鹿群、成本、鹿茸收益、种鹿销售收益与净收益测算。',
       '<button class="secondary-button" data-action="reconcile">发起对账</button><button class="primary-button" data-action="export-summary">导出演示摘要</button>')}
-      <div class="metric-grid compact">${metric('生物资产账面', 642.8, '万元', '模拟估值，不是审计结果')}${metric('订单金额', 20.7, '万元', '本期样例')}${metric('已回款', 12.4, '万元', '预测与实际分栏')}${metric('预算偏差', 6.8, '%', '设备维护高于情景', 'warning')}</div>
+      <div class="metric-grid compact">${metric('启动总投入', plan.startup.total, '万元', '鹿舍 350 / 鹿群 2,150')}${metric('首年总收益', year1.totalRevenue, '万元', '鹿茸收益')}${metric('第六年总收益', year6.totalRevenue, '万元', '鹿茸 1,624 / 种鹿 306')}${metric('第六年净收益', year6.netRevenue, '万元', '总支出 1,137 万元')}</div>
       <div class="content-grid">
-        ${panel('现金与订单', `<div class="big-chart">${spark(D.dashboardSeries.cash, '#d97706')}<div class="chart-marks"><span>模拟累计回款（万元）</span><b>11.2</b></div></div>`, { className: 'span-5', kicker: 'CASH COLLECTION' })}
-        ${panel('成本结构', `<div class="donut-wrap"><div class="donut" style="--a:28;--b:46;--c:64;--d:82"><span><b>100%</b><small>情景成本</small></span></div><div class="legend-list"><span><i style="background:#1677ff"></i>直接投入 28%</span><span><i style="background:#69a9ff"></i>人员 18%</span><span><i style="background:#f59e0b"></i>设备运维 18%</span><span><i style="background:#7f8fa3"></i>检测物流 18%</span><span><i style="background:#d5dce5"></i>其他 18%</span></div></div>`, { className: 'span-7', kicker: 'COST STRUCTURE' })}
+        ${panel('六年经营走势', `<div class="big-chart">${spark(D.dashboardSeries.revenue, '#1677ff')}<div class="chart-marks"><span>总收益 / 万元</span><b>480 → 1,930</b></div></div><div class="projection-legend"><span><i class="revenue"></i>收益持续增长</span><span><i class="profit"></i>第 3 年转正</span></div>`, { className: 'span-5', kicker: 'SIX-YEAR PROJECTION' })}
+        ${panel('测算关键假设', `<div class="assumption-grid"><div><span>母鹿繁殖率</span><b>${plan.assumptions.femaleBreedingRate}%</b></div><div><span>仔鹿成活率</span><b>${plan.assumptions.fawnSurvivalRate}%</b></div><div><span>鹿茸均价</span><b>¥ ${money(plan.assumptions.antlerPricePerKg)}/kg</b></div><div><span>公鹿年产茸</span><b>${plan.assumptions.antlerYieldPerMale} kg</b></div><div><span>运营管理费</span><b>${plan.assumptions.managementRate}%</b></div><div><span>母鹿销售率</span><b>${plan.assumptions.breedingFemaleSaleRate}%</b></div></div>`, { className: 'span-7', kicker: 'MODEL ASSUMPTIONS' })}
       </div>
-      ${panel('订单与回款', table(columns, D.orders, 'order-detail'), { kicker: 'ORDERS & RECEIVABLES' })}`;
+      ${panel('六年运营测算', projectionTable(), { kicker: 'OPERATING FORECAST', action: '<span class="projection-note">人民币万元，数量除外</span>' })}
+      <div class="lower">${panel('订单与回款样例', table(columns, D.orders, 'order-detail'), { kicker: 'OPERATING LEDGER SAMPLE' })}</div>`;
   }
 
   function farmers(state) {
@@ -251,14 +274,15 @@
   }
 
   function analytics() {
+    const years = D.investmentPlan.years;
     return `${pageHead('MANAGEMENT ANALYTICS', '管理分析', '每个指标保存分母、期间、版本与事实来源；点击指标可追溯到业务明细。',
       '<button class="secondary-button" data-action="reporting-status">报送状态</button><button class="primary-button" data-action="export-ledger">导出监管台账</button>')}
       <div class="analysis-grid">
-        ${panel('存栏滚动', `<div class="equation"><span>期初 780</span><b>+</b><span>出生 5</span><b>+</b><span>调入 2</span><b>−</b><span>调出 1</span><b>=</b><strong>期末 786</strong></div><p class="chart-note">内部跨圈转移不改变全场存栏。</p>`, { className: 'span-6', kicker: 'HERD RECONCILIATION' })}
+        ${panel('启动规模', `<div class="equation"><span>母鹿 1,000</span><b>+</b><span>公鹿 550</span><b>+</b><span>种公鹿 50</span><b>=</b><strong>启动 1,600</strong></div><p class="chart-note">按项目启动测算口径，不代表实际在栏。</p>`, { className: 'span-6', kicker: 'INITIAL HERD' })}
         ${panel('生产完成率', `<div class="big-chart">${spark(D.dashboardSeries.production, '#1677ff')}<div class="chart-marks"><span>按期完成率</span><b>93%</b></div></div>`, { className: 'span-6', kicker: 'PRODUCTION' })}
-        ${panel('健康事件', `<div class="big-chart">${spark(D.dashboardSeries.health, '#d92d20')}<div class="chart-marks"><span>每 100 鹿日待核事件</span><b>0.7</b></div></div>`, { className: 'span-4', kicker: 'HEALTH' })}
-        ${panel('环境趋势', `<div class="big-chart">${spark(D.dashboardSeries.environment, '#1677ff')}<div class="chart-marks"><span>A 区温度均值</span><b>22.4℃</b></div></div>`, { className: 'span-4', kicker: 'ENVIRONMENT' })}
-        ${panel('订单回款', `<div class="big-chart">${spark(D.dashboardSeries.cash, '#d97706')}<div class="chart-marks"><span>回款率</span><b>59.9%</b></div></div>`, { className: 'span-4', kicker: 'CASH' })}
+        ${panel('鹿群增长', `<div class="big-chart">${spark(D.dashboardSeries.herd, '#1677ff')}<div class="chart-marks"><span>启动至第六年</span><b>1,600 → 5,885</b></div></div>`, { className: 'span-4', kicker: 'HERD GROWTH' })}
+        ${panel('收益增长', `<div class="big-chart">${spark(D.dashboardSeries.revenue, '#26864a')}<div class="chart-marks"><span>六年总收益</span><b>480 → 1,930 万</b></div></div>`, { className: 'span-4', kicker: 'REVENUE' })}
+        ${panel('净收益', `<div class="big-chart">${spark(D.dashboardSeries.profit, '#d97706')}<div class="chart-marks"><span>第 ${years.find((x) => x.netRevenue > 0).year} 年转正</span><b>第六年 793 万</b></div></div>`, { className: 'span-4', kicker: 'NET REVENUE' })}
         ${panel('指标定义与事实来源', `<div class="definition-list"><button data-action="metric-detail" data-id="herd"><b>期末存栏</b><span>已确认出生/调入/调出/死亡事件</span><em>事务事实</em></button><button data-action="metric-detail" data-id="response"><b>工单响应</b><span>首次受理时间 − 告警生成时间</span><em>事件日志</em></button><button data-action="metric-detail" data-id="collection"><b>回款率</b><span>实际回执金额 / 到期应收金额</span><em>经营事实</em></button></div>`, { className: 'span-12', kicker: 'TRACEABLE METRICS' })}
       </div>`;
   }
