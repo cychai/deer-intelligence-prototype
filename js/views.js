@@ -53,9 +53,13 @@
       ['鹿群总数量', '头', 'herd'],
       ['母鹿数量', '头', 'female'],
       ['公鹿数量', '头', 'male'],
+      ['种公鹿数量', '头', 'breedingMale'],
       ['当年生产仔鹿', '头', 'newborn'],
+      ['仔鹿累计数量', '头', 'accumulatedFawns'],
       ['养殖费', '万元', 'breedingCost', 'cost'],
+      ['运营管理费', '万元', 'managementCost', 'cost'],
       ['鹿茸收益', '万元', 'antlerRevenue', 'revenue'],
+      ['淘汰母鹿', '头', 'culledFemales'],
       ['淘汰种鹿收益', '万元', 'breedingDeerRevenue', 'revenue'],
       ['总收益', '万元', 'totalRevenue', 'revenue'],
       ['总支出', '万元', 'totalExpense', 'cost'],
@@ -250,7 +254,7 @@
       <div class="metric-grid compact">${metric('启动总投入', plan.startup.total, '万元', '鹿舍 350 / 鹿群 2,150')}${metric('首年总收益', year1.totalRevenue, '万元', '鹿茸收益')}${metric('第六年总收益', year6.totalRevenue, '万元', '鹿茸 1,624 / 种鹿 306')}${metric('第六年净收益', year6.netRevenue, '万元', '总支出 1,137 万元')}</div>
       <div class="content-grid">
         ${panel('六年经营走势', `<div class="big-chart">${spark(D.dashboardSeries.revenue, '#1677ff')}<div class="chart-marks"><span>总收益 / 万元</span><b>480 → 1,930</b></div></div><div class="projection-legend"><span><i class="revenue"></i>收益持续增长</span><span><i class="profit"></i>第 3 年转正</span></div>`, { className: 'span-5', kicker: 'SIX-YEAR PROJECTION' })}
-        ${panel('测算关键假设', `<div class="assumption-grid"><div><span>母鹿繁殖率</span><b>${plan.assumptions.femaleBreedingRate}%</b></div><div><span>仔鹿成活率</span><b>${plan.assumptions.fawnSurvivalRate}%</b></div><div><span>鹿茸均价</span><b>¥ ${money(plan.assumptions.antlerPricePerKg)}/kg</b></div><div><span>公鹿年产茸</span><b>${plan.assumptions.antlerYieldPerMale} kg</b></div><div><span>运营管理费</span><b>${plan.assumptions.managementRate}%</b></div><div><span>母鹿销售率</span><b>${plan.assumptions.breedingFemaleSaleRate}%</b></div></div>`, { className: 'span-7', kicker: 'MODEL ASSUMPTIONS' })}
+        ${panel('测算关键假设', `<div class="assumption-grid"><div><span>母鹿繁殖率</span><b>${plan.assumptions.femaleBreedingRate}%</b></div><div><span>仔鹿成活率</span><b>${plan.assumptions.fawnSurvivalRate}%</b></div><div><span>鹿茸均价</span><b>¥ ${money(plan.assumptions.antlerPricePerKg)}/kg</b></div><div><span>公鹿年产茸</span><b>${plan.assumptions.antlerYieldPerMale} kg</b></div><div><span>运营管理费</span><b>${plan.assumptions.managementRate}%</b></div><div><span>母鹿销售率</span><b>${plan.assumptions.breedingFemaleSaleRate}%</b></div></div><p class="chart-note">${esc(plan.assumptions.roundingNote)}</p>`, { className: 'span-7', kicker: 'MODEL ASSUMPTIONS' })}
       </div>
       ${panel('六年运营测算', projectionTable(), { kicker: 'OPERATING FORECAST', action: '<span class="projection-note">人民币万元，数量除外</span>' })}
       <div class="lower">${panel('订单与回款样例', table(columns, D.orders, 'order-detail'), { kicker: 'OPERATING LEDGER SAMPLE' })}</div>`;
